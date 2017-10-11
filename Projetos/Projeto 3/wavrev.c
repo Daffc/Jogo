@@ -14,57 +14,6 @@ int main (int argc, char *argv[])
     int                 i,
                         transitorio;
 
-    /*
-    if(argc > 1)
-    {
-        i = 1;
-
-        while(i < argc)
-        {
-            if(argv[i][0] == '-')
-            {
-                switch(argv[i][1])
-                {
-                    case'i':
-                        i++;
-                        if(i < argc)
-                        {
-                            origem = malloc(sizeof(argv[i]));
-                            strcpy(origem,argv[i]);
-                        }
-                        else
-                        {
-                            printf("Arquivo não informado.\n");
-                            exit(1);
-                        }
-                        
-                        break;
-                    
-                    case'o':
-                        i++;
-
-                        if(i < argc)
-                        {
-                            destino = malloc(sizeof(argv[i]));
-                            strcpy(destino,argv[i]);
-                        }
-                        else
-                        {
-                            printf("Destino não informado.\n");
-                            exit(1);
-                        }
-                        
-                        break;
-                    default:
-                        printf("Parâmetro \"%s\" não identificado.\n", argv[i]);
-                        exit(1);       
-                }
-            }
-            i++;
-        }
-    }
-    */
-
     tratamento_simples(argc, argv, "io" , 2, &origem, &destino, NULL, NULL);
 
     // Carrega informações do audio de entrada na structure "cabecalho". 
