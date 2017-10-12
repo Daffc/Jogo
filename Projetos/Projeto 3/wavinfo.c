@@ -12,7 +12,7 @@ int main (int argc, char *argv[])
                         palavra[4][5];
 
     // Le argumentos de linha de comando e trata-os conforme estipulado.
-    tratamento_simples(argc, argv, "i" , 1, &origem, NULL, NULL, NULL);
+    tratamento_simples(&argc, argv, "i" , 1, &origem, NULL, NULL, NULL);
     
     // Carrega informações do audio de entrada na structure "cabecalho". 
     audio_load(origem, &cabecalho);

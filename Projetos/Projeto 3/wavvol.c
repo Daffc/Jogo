@@ -16,7 +16,7 @@ int main (int argc, char *argv[])
     float               volume = 1;
 
 
-    tratamento_simples(argc, argv, "ilo" , 3, &origem, &destino, NULL, &volume);
+    tratamento_simples(&argc, argv, "ilo" , 3, &origem, &destino, NULL, &volume);
 
     if ((volume >= 0) && (volume <= 10))
     {

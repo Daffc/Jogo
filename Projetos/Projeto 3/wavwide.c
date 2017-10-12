@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include "audio-open.h"
+#include "arg-treat.h"
 
 int main (int argc, char *argv[])
 {     
@@ -11,91 +12,79 @@ int main (int argc, char *argv[])
     char                *origem = NULL,
                         *destino = NULL;
 
-    int                 i;
+    int                 i,
+                        maior_sample = 0,
+                        *transitorio;
 
-    short               diferenca;
+    short               desvio,
+                        max_amplitude = 32767;
 
-    double              fator = 1;
+    float               fator = 1.0,
+                        diferenca;
 
-    if(argc > 1)
+
+
+    tratamento_simples(&argc, argv, "ilo" , 3, &origem, &destino, NULL, &fator);
+
+    if((fator >=0) && (fator <= 10))
     {
-        i = 1;
-
-        while(i < argc)
+        // Carrega informações do audio de entrada na structure "cabecalho". 
+        audio_load(origem, &cabecalho);
+        
+        if(cabecalho.num_channels == 2)
         {
-            if(argv[i][0] == '-')
-            {
-                switch(argv[i][1])
+
+            transitorio = malloc(cabecalho.data_size * ( sizeof(int)/sizeof(short) ));
+            
+            // Laço percorre a semple de duas em duas ( conjunto L e R ) e efetua operação para gerar 
+            // efeito desejado e guardando resultado em malloc "transitorio".
+            for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i += 2)
+            {  
+                desvio = *(((short *)(cabecalho.DATA)) + i + 1) - *(((short *)(cabecalho.DATA)) + i);
+
+
+                *(transitorio + i) = *(((short *)(cabecalho.DATA)) + i) - trunc(fator * desvio);
+                *(transitorio + i + 1) =*(((short *)(cabecalho.DATA)) + i + 1) + trunc(fator * desvio);
+                
+                if(abs(*(transitorio + i)) > maior_sample)
                 {
-                    case'i':
-                        i++;
-                        if(i < argc)
-                        {
-                            origem = malloc(sizeof(argv[i]));
-                            strcpy(origem,argv[i]);
-                        }
-                        else
-                        {
-                            printf("Arquivo não informado.\n");
-                            exit(1);
-                        }
-                        
-                        break;
-                    
-                        case'o':
-                        i++;
-
-                        if(i < argc)
-                        {
-                            destino = malloc(sizeof(argv[i]));
-                            strcpy(destino,argv[i]);
-                        }
-                        else
-                        {
-                            printf("Destino não informado.\n");
-                            exit(1);
-                        }
-                        
-                        break;
-                    case'l':
-                        i++;
-
-                        if(i < argc)
-                        {
-                            fator = atof(argv[i]);
-                        }
-                        
-                        break;
-                    default:
-                        printf("Parâmetro \"%s\" não identificado.\n", argv[i]);
-                        exit(1);       
+                    maior_sample = abs(*(transitorio + i));
                 }
                 
-                i++;
+                if(abs(*(transitorio + i + 1)) >maior_sample)
+                {
+                    maior_sample = abs(*(transitorio + i + 1));
+                }
+
             }
+
+            // Calcula o indice para normalização do aldio após  efeito formado.
+            diferenca =  max_amplitude * 1.0 / maior_sample;
+            printf("%f\n",diferenca);
+            for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
+            {   
+                *((short *)(cabecalho.DATA) + i) = trunc(*(transitorio + i) * diferenca);
+            }
+                        
+            // Envia informações para imprimir em arquivo selecionado 
+            // ou saida padrão o arquivo wave configurado.
+            audio_set(destino, &cabecalho);
+
+            // Libera memoria alocada por todos os mallocs feitos pelo programa.
+            free(cabecalho.DATA);
+            return(0);
         }
-    }
-
-    // Carrega informações do audio de entrada na structure "cabecalho". 
-    audio_load(origem, &cabecalho);
-    
-    // Laço percorre a semple de duas em duas ( conjunto L e R ) e efetua operação para gerar efeito desejado.
-    for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i += 2)
-    {  
-        diferenca = *(((short *)(cabecalho.DATA)) + i + 1) - *(((short *)(cabecalho.DATA)) + i);
-
-        *(((short *)(cabecalho.DATA)) + i) -= trunc(fator * diferenca);
-        *(((short *)(cabecalho.DATA)) + i + 1) += trunc(fator * diferenca);
+        else
+        {
+            fprintf(stderr, "O efeito só pode ser aplicado a arquivos wave com 2 canais.");
+            exit(-1);
+        }
         
     }
-    
-    // Envia informações para imprimir em arquivo selecionado 
-    // ou saida padrão o arquivo wave configurado.
-    audio_set(destino, &cabecalho);
 
-    // Libera memoria alocada por todos os mallocs feitos pelo programa.
-    free(origem);
-    free(destino);
-    free(cabecalho.DATA);
-    return(0);
+    else
+    {
+        fprintf(stderr, "O fator de diferença deve estar entre 0.0 e 10.0\n");
+        exit(-1);
+    }
 }

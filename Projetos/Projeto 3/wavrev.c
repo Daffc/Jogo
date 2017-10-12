@@ -14,13 +14,13 @@ int main (int argc, char *argv[])
     int                 i,
                         transitorio;
 
-    tratamento_simples(argc, argv, "io" , 2, &origem, &destino, NULL, NULL);
+    tratamento_simples(&argc, argv, "io" , 2, &origem, &destino, NULL, NULL);
 
     // Carrega informações do audio de entrada na structure "cabecalho". 
     audio_load(origem, &cabecalho);
 
-    // Laçoira repetir "samples_channel" / 2 arredondado para baxo, veses e 
-    // trocaraos o primeiro valor cm o ultimo, o segundo com o penultimo e assim sucessivamente.
+    // Laçoira repetir ("samples_channel" / 2 arredondado para baixo) veses e 
+    // trocarão o primeiro valor com o ultimo, o segundo com o penultimo e assim sucessivamente.
     for(i = 0; i <= ((cabecalho.samples_channel / 2) - 1); i++)
     {
         transitorio = *(((int *)(cabecalho.DATA)) + i);

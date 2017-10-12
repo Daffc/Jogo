@@ -22,7 +22,7 @@ int main (int argc, char *argv[])
                         // Vetor para guardar coeficiente de normalização de cada canal.
     double              *diferenca;
 
-    tratamento_simples(argc, argv, "io" , 2, &origem, &destino, NULL, NULL);
+    tratamento_simples(&argc, argv, "io" , 2, &origem, &destino, NULL, NULL);
 
     // Carrega informações do audio de entrada na structure "cabecalho".
     audio_load(origem, &cabecalho);

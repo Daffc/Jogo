@@ -4,33 +4,33 @@ LDLIBS = -lm       # bibliotecas a ligar
 EXECS  = wavinfo wavrev wavvol wavautovol wavecho wavwide wavcat wavmix clean
  
 # arquivos-objeto
-objects = wavvol.o wavautovol.o wavinfo.o  wavrev.o wavecho.o wavwide.o wavcat.o wavmix.o audio-open.o 
+objects = wavvol.o wavautovol.o wavinfo.o  wavrev.o wavecho.o wavwide.o wavcat.o wavmix.o audio-open.o arg-treat.o
 
 all:  $(EXECS)
 
-wavinfo: wavinfo.o audio-open.o
-	gcc wavinfo.o audio-open.o -o wavinfo
+wavinfo: wavinfo.o audio-open.o arg-treat.o
+	gcc wavinfo.o audio-open.o  arg-treat.o -o wavinfo
 
-wavrev: wavrev.o audio-open.o
-	gcc wavrev.o audio-open.o -o wavrev
+wavrev: wavrev.o audio-open.o arg-treat.o
+	gcc wavrev.o audio-open.o arg-treat.o -o wavrev
 
-wavvol: wavvol.o audio-open.o
-	gcc wavvol.o audio-open.o -o wavvol
+wavvol: wavvol.o audio-open.o arg-treat.o
+	gcc wavvol.o audio-open.o arg-treat.o -o wavvol
 
 wavautovol: wavautovol.o audio-open.o 
-	gcc wavautovol.o audio-open.o -o wavautovol $(LDLIBS) 
+	gcc wavautovol.o audio-open.o arg-treat.o -o wavautovol $(LDLIBS) 
 
-wavecho: wavecho.o audio-open.o
-	gcc wavecho.o audio-open.o -o wavecho $(LDLIBS) 
+wavecho: wavecho.o audio-open.o arg-treat.o
+	gcc wavecho.o audio-open.o arg-treat.o -o wavecho $(LDLIBS) 
 
-wavwide: wavwide.o audio-open.o
-	gcc wavwide.o audio-open.o -o wavwide $(LDLIBS) 
+wavwide: wavwide.o audio-open.o arg-treat.o
+	gcc wavwide.o audio-open.o arg-treat.o -o wavwide $(LDLIBS) 
 
-wavcat: wavcat.o audio-open.o
-	gcc wavcat.o audio-open.o -o wavcat
+wavcat: wavcat.o audio-open.o arg-treat.o
+	gcc wavcat.o audio-open.o arg-treat.o -o wavcat
 
-wavmix: wavmix.o audio-open.o
-	gcc wavmix.o audio-open.o -o wavmix $(LDLIBS) 
+wavmix: wavmix.o audio-open.o arg-treat.o
+	gcc wavmix.o audio-open.o arg-treat.o -o wavmix $(LDLIBS) 
 
 
 
@@ -60,6 +60,9 @@ wavmix.o: wavmix.c audio-open.h
 
 audio-open.o: audio-open.c audio-open.h
 	gcc -c audio-open.c $(CFLAGS)
+
+arg-treat.o: arg-treat.c arg-treat.h
+	gcc -c arg-treat.c $(CFLAGS)
 
 
 clean :

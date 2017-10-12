@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include "audio-open.h"
+#include "arg-treat.h"
 
 int main (int argc, char *argv[])
 {     
@@ -12,99 +13,79 @@ int main (int argc, char *argv[])
                         *destino = NULL;
 
     int                 i,
-                        tempo = 1000;
+                        tempo = 1000,
+                        maior_sample = 0,
+                        soma_echo,
+                        *transitorio;
+    
+    short               max_amplitude = 32767;
 
-    float               atenuacao = 0.5;
+    float               atenuacao = 0.5,
+                        diferenca;
 
+    tratamento_simples(&argc, argv, "ilot" , 4, &origem, &destino, &tempo, &atenuacao);
 
-    if(argc > 1)
+    if((tempo >= 0) && (atenuacao >= 0) && (atenuacao <= 1.0))
     {
-        i = 1;
+        // Carrega informações do audio de entrada na structure "cabecalho". 
+        audio_load(origem, &cabecalho);
 
-        while(i < argc)
+        transitorio = malloc(cabecalho.data_size * ( sizeof(int)/sizeof(short) ));
+
+        for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
+        {   
+
+            *(transitorio + i) = *(((short *)(cabecalho.DATA)) + i);
+        }
+    
+        // Laço que ira propagar o eco enquanto o tempo para o fim for maior que o tempo de propagação do eco 
+        // (caso o número de samples necessária para propagação seja menor que o numero de samples para o fim do arquivo).
+        // A soma de 0.5 serve para melhor aprocimação no arredondamento pos cast de floa para int.
+
+        i = 0;
+
+        while(i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5) <= (cabecalho.samples_channel * cabecalho.num_channels))
         {
-            if(argv[i][0] == '-')
+            // DESLOCAMENTO NO TEMPO(POSICAO[i + (SAMPLES/SEG * SEG)]) += (POSIÇÃO[i] * atenuação);
+            // A soma de 0.5 serve para melhor aprocimação no arredondamento pos cast de floa para int.
+            *(transitorio + i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5)) = *(((short *)(cabecalho.DATA)) + i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5)) + trunc(*((short *)(cabecalho.DATA) + i) * atenuacao);
+            
+            soma_echo = abs(*(transitorio + i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5)));
+            
+            // Verifica qual o maior valor encontrado na soma entre (estado + eco) 
+            // e guarda=o na variável "maior_sample".
+            if(soma_echo > maior_sample)
             {
-                switch(argv[i][1])
-                {
-                    case'i':
-                        i++;
-                        if(i < argc)
-                        {
-                            origem = malloc(sizeof(argv[i]));
-                            strcpy(origem,argv[i]);
-                        }
-                        else
-                        {
-                            printf("Arquivo não informado.\n");
-                            exit(1);
-                        }
-                        
-                        break;
-                    
-                    case'o':
-                        i++;
-
-                        if(i < argc)
-                        {
-                            destino = malloc(sizeof(argv[i]));
-                            strcpy(destino,argv[i]);
-                        }
-                        else
-                        {
-                            printf("Destino não informado.\n");
-                            exit(1);
-                        }
-                        
-                        break;
-
-                        case'l':
-                        i++;
-
-                        if(i < argc)
-                        {
-                            atenuacao = atof(argv[i]);
-                        }                        
-                        break;
-
-                        case't':
-                        i++;
-
-                        if(i < argc)
-                        {
-                            tempo = atoi(argv[i]);
-                        }                        
-                        break;
-
-                    default:
-                        printf("Parâmetro \"%s\" não identificado.\n", argv[i]);
-                        exit(1);       
-                }
-            }
+                maior_sample = soma_echo;        
+            }                
+            
             i++;
         }
-    }
 
-    // Carrega informações do audio de entrada na structure "cabecalho". 
-    audio_load(origem, &cabecalho);
+        // Calcula o indice para normalização do aldio após  eco ja formado na malloc "transitorio".
+        diferenca =  max_amplitude * 1.0 / maior_sample;
 
-    // Laço que ira propagar o eco enquanto o tempo para o fim for maior que o tempo de propagação do eco 
-    // (caso o número de samples necessária para propagação seja menor que o numero de samples para o fim do arquivo).
-    while(i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5) <= (cabecalho.samples_channel * cabecalho.num_channels))
-    {
-        // DESLOCAMENTO NO TEMPO(POSICAO[i + (SAMPLES/SEG * SEG)]) += (POSIÇÃO[i] * atenuação);
-        *(((short *)(cabecalho.DATA)) + i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5)) += trunc(*((short *)(cabecalho.DATA) + i) * atenuacao);
-        
-        i++;
-    }
+        // Laço onde serão realocadas as samples do audio do malloc "transitorio" para 
+        // "cabecalho.DATA" de forma a normaliza-las Evitando a depredação do audio final.
+        for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
+        {   
+            *((short *)(cabecalho.DATA) + i) = trunc(*(transitorio + i) * diferenca);
+        }
+
+        // Envia informações para imprimir em arquivo selecionado 
+        // ou saida padrão o arquivo wave configurado.
+        audio_set(destino, &cabecalho);
     
-    // Envia informações para imprimir em arquivo selecionado 
-    // ou saida padrão o arquivo wave configurado.
-    audio_set(destino, &cabecalho);
+        // Libera memoria alocada por todos os mallocs feitos pelo programa.
+        free(cabecalho.DATA);
+        free(transitorio);
+        return(0);
+    }
 
-    // Libera memoria alocada por todos os mallocs feitos pelo programa.
-    free(origem);
-    free(destino);
-    free(cabecalho.DATA);
-    return(0);
+    else
+    {
+        fprintf(stderr, "O tempo precisa ser maior que 0 e a atenuação  entre 0.0 e 1.0\n");
+        exit(-1);
+    }
+   
 }
