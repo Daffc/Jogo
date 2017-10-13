@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "arg-treat.h"
+#include "utilidades.h"
 
 
 
@@ -14,6 +15,7 @@ void tratamento_simples(int *argc, char *argv[], char *params , int qnt_params, 
 {
     int             i;
 
+    // Verifica-se caso a chamada do execultavel contanha mais de um elemento (chamada + argumentos).
     if(*argc > 1)
     {
         i = 1;
@@ -37,7 +39,7 @@ void tratamento_simples(int *argc, char *argv[], char *params , int qnt_params, 
                             // Verifica se o próximo parâmetro existe, caso exista guarda string contendo o edereço para esse .
                             if(i < *argc)
                             {
-                                *in  = malloc(sizeof(argv[i]));
+                                *in = malloc_seguro(sizeof(argv[i]));
                                 strcpy(*in ,argv[i]);
                             }
                             else
@@ -164,14 +166,18 @@ void tratamento_multiplo(int *argc, char *argv[], char *params , int qnt_params,
 {
     int             i;
     
+    // Verifica-se caso a chamada do execultavel contanha mais de um elemento (chamada + argumentos).
     if(*argc > 1)
     {
         i = 1;
-        
+        // Laço para ler todos os elementos  do vetor argv[] (exceto o primeiro).
         while(i < *argc)
         {
+            // Identifica caso o primeiro char da string indicada informe o simbolo '-'.
             if(argv[i][0] == '-')
             {
+                // Verifica e separa os parametros passados pela linha de comando, utilizando-os e 
+                // armazenando-os ou informando qual parametro não pode ser identificado e terminando execução de aplicação.
                 switch(argv[i][1])
                 {                    
                     case'o':

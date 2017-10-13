@@ -4,6 +4,7 @@
 #include <math.h>
 #include "audio-open.h"
 #include "arg-treat.h"
+#include "utilidades.h"
 
 int main (int argc, char *argv[])
 {     
@@ -30,7 +31,7 @@ int main (int argc, char *argv[])
         // Carrega informações do audio de entrada na structure "cabecalho". 
         audio_load(origem, &cabecalho);
 
-        transitorio = malloc(cabecalho.data_size * ( sizeof(int)/sizeof(short) ));
+        transitorio = malloc_seguro(cabecalho.data_size * ( sizeof(int)/sizeof(short) ));
 
         for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
         {   

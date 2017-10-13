@@ -4,6 +4,7 @@
 #include <math.h>
 #include "audio-open.h"
 #include "arg-treat.h"
+#include "utilidades.h"
 
 int main (int argc, char *argv[])
 {     
@@ -31,7 +32,7 @@ int main (int argc, char *argv[])
     if(entradas >= 1)
     {
         // reserva espaço para alocar todos os arquivos de audio informados.
-    cabecalho = malloc(sizeof(Music_header) * entradas);
+    cabecalho = malloc_seguro(sizeof(Music_header) * entradas);
     
         // Laço organiza cada arquivo de entrada a uma structure 
         // armazenada no vetor cabecalho.
@@ -83,7 +84,7 @@ int main (int argc, char *argv[])
         // das várias entradas.
         saida.data_size = comprimento_max;
         saida.riff_size = saida.data_size + 36;
-        saida.DATA = malloc(comprimento_max);
+        saida.DATA = malloc_seguro(comprimento_max);
         saida.samples_channel = saida.data_size / saida.block_align;
     
     

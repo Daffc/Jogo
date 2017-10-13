@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "audio-open.h"
+#include "utilidades.h"
 
 void audio_load(char caminho[], Music_header *wave)
 {
@@ -30,13 +31,13 @@ void audio_load(char caminho[], Music_header *wave)
     fread(wave, 44, 1, arquivo);
 
     // Calcula-se a quantidade de samples/canal do arquivo .wav indicado.
-    (*wave).samples_channel = (*wave).data_size / (*wave).block_align;
+    wave->samples_channel = wave->data_size / wave->block_align;
 
     // Aloca-se espaço em memória para armazenar as informações relativas ao audio do arquivo .wav.
-    (*wave).DATA = malloc((*wave).data_size);
+    wave->DATA  = malloc_seguro(wave->data_size);
 
     // Comporta dados de audio no espaço em memória criado anteriormente.
-    fread((*wave).DATA, (*wave).data_size, 1, arquivo);
+    fread(wave->DATA, wave->data_size, 1, arquivo);
 
     // Fecha-se stream com arquivo indicado.
     fclose(arquivo);
@@ -69,7 +70,7 @@ void audio_set(char caminho[], Music_header *wave)
     fwrite(wave, 44, 1,  arquivo);
 
     // Escreve informaçõesrelativas ao audio contidas no espaço indicado em memoria na stream.
-    fwrite((*wave).DATA, (*wave).data_size, 1, arquivo);
+    fwrite(wave->DATA, wave->data_size, 1, arquivo);
     
     // Fecha-se conexão com stream.
     fclose(arquivo);

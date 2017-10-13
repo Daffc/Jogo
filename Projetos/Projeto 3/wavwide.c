@@ -4,6 +4,7 @@
 #include <math.h>
 #include "audio-open.h"
 #include "arg-treat.h"
+#include "utilidades.h"
 
 int main (int argc, char *argv[])
 {     
@@ -34,7 +35,7 @@ int main (int argc, char *argv[])
         if(cabecalho.num_channels == 2)
         {
 
-            transitorio = malloc(cabecalho.data_size * ( sizeof(int)/sizeof(short) ));
+            transitorio = malloc_seguro(cabecalho.data_size * ( sizeof(int)/sizeof(short) ));
             
             // Laço percorre a semple de duas em duas ( conjunto L e R ) e efetua operação para gerar 
             // efeito desejado e guardando resultado em malloc "transitorio".
@@ -60,7 +61,9 @@ int main (int argc, char *argv[])
 
             // Calcula o indice para normalização do aldio após  efeito formado.
             diferenca =  max_amplitude * 1.0 / maior_sample;
-            printf("%f\n",diferenca);
+
+            // Tranferem-se informações para o malloc cabecalho.DATA normalizados de 
+            // forma a preservar a qualidade do audio.
             for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
             {   
                 *((short *)(cabecalho.DATA) + i) = trunc(*(transitorio + i) * diferenca);
@@ -78,10 +81,8 @@ int main (int argc, char *argv[])
         {
             fprintf(stderr, "O efeito só pode ser aplicado a arquivos wave com 2 canais.");
             exit(-1);
-        }
-        
+        }        
     }
-
     else
     {
         fprintf(stderr, "O fator de diferença deve estar entre 0.0 e 10.0\n");

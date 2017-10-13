@@ -4,6 +4,7 @@
 #include <math.h>
 #include "audio-open.h"
 #include "arg-treat.h"
+#include "utilidades.h"
 
 int main (int argc, char *argv[])
 {     
@@ -30,8 +31,8 @@ int main (int argc, char *argv[])
     // Criam-se vetores um para armazenar os maiores valores de cada um dos
     // canais e outro para armazenar o incice de correção de acordo com o número 
     // de canais informados no header do arquivo .wav.
-    maior = malloc(cabecalho.num_channels * sizeof(short));
-    diferenca = malloc(cabecalho.num_channels * sizeof(double));
+    maior = malloc_seguro(cabecalho.num_channels * sizeof(short));
+    diferenca = malloc_seguro(cabecalho.num_channels * sizeof(double));
 
     // Zeram-se todos os valores relacionados ao número de canais.
     for(i = 0; i < cabecalho.num_channels; i++)
