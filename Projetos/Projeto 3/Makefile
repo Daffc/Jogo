@@ -1,3 +1,6 @@
+# DOUGLAS AFFONSO CLEMENTINO
+# GRR20175877
+
 CFLAGS = -Wall     # flags de compilacao
 LDLIBS = -lm       # bibliotecas a ligar
 
