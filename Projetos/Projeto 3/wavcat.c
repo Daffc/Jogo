@@ -38,9 +38,9 @@ int main (int argc, char *argv[])
 
             // Verifica se todos os arquivos wav dados como entrada possuem o mesmo semple rate, 
             // caso não possuam, o programa é abortado.
-            if((i > 1) && ((cabecalho + i)->sample_rate != (cabecalho + (i - 1))->sample_rate))
+            if((i >= 1) && ((cabecalho + i)->sample_rate != (cabecalho + (i - 1))->sample_rate))
             {
-                fprintf(stderr, "O programa só pode tratar de arquivos wav com o mesmo sample rate.");
+                fprintf(stderr, "O programa só pode tratar de arquivos wave com o mesmo sample rate.\n");
                 exit(-1);
             }
         }
