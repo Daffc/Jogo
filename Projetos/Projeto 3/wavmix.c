@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
 #include "audio-open.h"
 #include "arg-treat.h"
 #include "utilidades.h"
@@ -14,7 +15,7 @@ int main (int argc, char *argv[])
     char                *pnts_origem[50],
                         *destino = NULL;
 
-    int                 i,
+    int32_t             i,
                         j,
                         entradas = 0,
                         comprimento_max = 0,
@@ -32,18 +33,27 @@ int main (int argc, char *argv[])
     if(entradas >= 1)
     {
         // reserva espaço para alocar todos os arquivos de audio informados.
-    cabecalho = malloc_seguro(sizeof(Music_header) * entradas);
+        cabecalho = malloc_seguro(sizeof(Music_header) * entradas);
     
         // Laço organiza cada arquivo de entrada a uma structure 
         // armazenada no vetor cabecalho.
         for(i = 0; i < entradas; i++)
         {
+            // Carrega cada arquivo de audio indicado como entrada em uma structure própria.
             audio_load(pnts_origem[i], (cabecalho + i));
             
             // Separa o maior comprimento de audio, que será o comprimento do audio mixado.
             if((cabecalho + i)->data_size > comprimento_max)
             {
                 comprimento_max = (cabecalho + i)->data_size;
+            }
+
+            // Verifica se todos os arquivos wav dados como entrada possuem o mesmo semple rate, 
+            // caso não possuam, o programa é abortado.
+            if((i > 1) && ((cabecalho + i)->sample_rate != (cabecalho + (i - 1))->sample_rate))
+            {
+                fprintf(stderr, "O programa só pode tratar de arquivos wav com o mesmo sample rate.");
+                exit(-1);
             }
         }
     

@@ -30,8 +30,19 @@ int main (int argc, char *argv[])
         // armazenada no vetor cabecalho.
         for(i = 0; i < entradas; i++)
         {
+            // Carrega cada arquivo de audio indicado como entrada em uma structure própria
             audio_load(pnts_origem[i], (cabecalho + i));
+
+            // Soma o comprimento dos  audios dados como entrada na variável "comprimento_max"
             comprimento_max += (cabecalho + i)->data_size;
+
+            // Verifica se todos os arquivos wav dados como entrada possuem o mesmo semple rate, 
+            // caso não possuam, o programa é abortado.
+            if((i > 1) && ((cabecalho + i)->sample_rate != (cabecalho + (i - 1))->sample_rate))
+            {
+                fprintf(stderr, "O programa só pode tratar de arquivos wav com o mesmo sample rate.");
+                exit(-1);
+            }
         }
     
     

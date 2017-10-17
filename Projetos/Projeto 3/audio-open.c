@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "audio-open.h"
 #include "utilidades.h"
 
@@ -18,7 +19,7 @@ void audio_load(char caminho[], Music_header *wave)
         if(!arquivo)
         {
             perror("Erro ao abrir arquivo.");
-            exit(1);
+            exit(-1);
         }
     }
 
@@ -57,7 +58,7 @@ void audio_set(char caminho[], Music_header *wave)
         if(!arquivo)
         {
             perror("Erro ao abrir arquivo.");
-            exit(1);
+            exit(-1);
         }
     }
 

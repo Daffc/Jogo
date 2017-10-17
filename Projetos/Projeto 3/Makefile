@@ -1,7 +1,7 @@
 CFLAGS = -Wall     # flags de compilacao
 LDLIBS = -lm       # bibliotecas a ligar
 
-EXECS  = wavinfo wavrev wavvol wavautovol wavecho wavwide wavcat wavmix clean
+EXECS  = wavinfo wavrev wavvol wavautovol wavecho wavwide wavcat wavmix
  
 # arquivos-objeto
 objects = wavvol.o wavautovol.o wavinfo.o  wavrev.o wavecho.o wavwide.o wavcat.o wavmix.o audio-open.o arg-treat.o utilidades.o
@@ -68,8 +68,9 @@ utilidades.o: utilidades.c utilidades.h
 	gcc -c utilidades.c $(CFLAGS)
 
 
-clean :
+clean:
 	-rm $(objects)
+	-rm *~
 
-purge:
+purge: clean
 	-rm $(EXECS)

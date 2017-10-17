@@ -1,32 +1,34 @@
+#include <stdint.h>
 #ifndef _AUDIO_OPEN_
 #define _AUDIO_OPEN_
 
+
 typedef struct Music_header{
 
-    unsigned char   riff_tag[4];
+    unsigned char       riff_tag[4];
 
-    unsigned int    riff_size;
+    uint32_t   riff_size;
 
-    unsigned char   wave_tag[4],
-                    form_tag[4];
+    unsigned char       wave_tag[4],
+                        form_tag[4];
 
-    unsigned int    fmt_size;
+    uint32_t            fmt_size;
     
-    short           audio_format,
-                    num_channels;
+    short               audio_format,
+                        num_channels;
 
-    unsigned int    sample_rate,
-                    byte_rate;
+    uint32_t            sample_rate,
+                        byte_rate;
 
-    short           block_align,
-                    bits_per_sample;
+    short               block_align,
+                        bits_per_sample;
     
-    unsigned char   data_tag[4];    
+    unsigned char       data_tag[4];    
 
-    unsigned int    data_size,
-                    samples_channel;
+    uint32_t            data_size,
+                        samples_channel;
 
-    void            *DATA;
+    void                *DATA;
 } Music_header;
 
 // Função para carregar informações da stream indicada pelo ponteiro "caminho" 
