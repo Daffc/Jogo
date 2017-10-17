@@ -32,8 +32,9 @@ void tratamento_simples(int *argc, char *argv[], char *params , int qnt_params, 
                     case'i':
                         
                         // Verifica se o parâmetro em questão esta indicado na string *params, 
-                        // que contem os parametros que serão usados na chamada indicada.
-                        if( bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL)
+                        // que contem os parametros que serão usados na chamada indicada e se 
+                        // essa string se restringe a apenas 2 caracteres exceto '\0'.
+                        if((bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL) && (argv[i][2] == '\0'))
                         {
                             i++;                        
                             // Verifica se o próximo parâmetro existe, caso exista guarda string contendo o edereço para esse .
@@ -62,8 +63,9 @@ void tratamento_simples(int *argc, char *argv[], char *params , int qnt_params, 
                     case'o':
                         
                         // Verifica se o parâmetro em questão esta indicado na string *params, 
-                        // que contem os parametros que serão usados na chamada indicada.
-                        if( bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL)
+                        // que contem os parametros que serão usados na chamada indicada e se 
+                        // essa string se restringe a apenas 2 caracteres exceto '\0'.
+                        if((bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL) && (argv[i][2] == '\0'))
                         {
                             i++;                        
                             // Verifica se o próximo parâmetro existe, caso exista guarda string contendo o edereço para esse .
@@ -90,8 +92,9 @@ void tratamento_simples(int *argc, char *argv[], char *params , int qnt_params, 
                     case't':
                         
                         // Verifica se o parâmetro em questão esta indicado na string *params, 
-                        // que contem os parametros que serão usados na chamada indicada.
-                        if( bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL)
+                        // que contem os parametros que serão usados na chamada indicada e se 
+                        // essa string se restringe a apenas 2 caracteres exceto '\0'.
+                        if((bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL) && (argv[i][2] == '\0'))
                         {
                             i++;                        
                             // Verifica se o próximo parâmetro existe, caso exista guarda string contendo o edereço para esse .
@@ -118,8 +121,9 @@ void tratamento_simples(int *argc, char *argv[], char *params , int qnt_params, 
                     case'l':
                         
                         // Verifica se o parâmetro em questão esta indicado na string *params, 
-                        // que contem os parametros que serão usados na chamada indicada.
-                        if( bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL)
+                        // que contem os parametros que serão usados na chamada indicada e se 
+                        // essa string se restringe a apenas 2 caracteres exceto '\0'.
+                        if((bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL) && (argv[i][2] == '\0'))
                         {
                             i++;                        
                             // Verifica se o próximo parâmetro existe, caso exista guarda string contendo o edereço para esse .
@@ -182,8 +186,9 @@ void tratamento_multiplo(int *argc, char *argv[], char *params , int qnt_params,
                 {                    
                     case'o':
                         // Verifica se o parâmetro em questão esta indicado na string *params, 
-                        // que contem os parametros que serão usados na chamada indicada.
-                        if( bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL)
+                        // que contem os parametros que serão usados na chamada indicada e se 
+                        // essa string se restringe a apenas 2 caracteres exceto '\0'.
+                        if((bsearch(&argv[i][1], params, qnt_params, sizeof(char),compara) != NULL) && (argv[i][2] == '\0'))
                         {
                             i++;                        
                             // Verifica se o próximo parâmetro existe, caso exista guarda string contendo o edereço para esse .
