@@ -14,13 +14,13 @@ typedef struct Music_header{
 
     uint32_t            fmt_size;
     
-    short               audio_format,
+    uint16_t            audio_format,
                         num_channels;
 
     uint32_t            sample_rate,
                         byte_rate;
 
-    short               block_align,
+    uint16_t            block_align,
                         bits_per_sample;
     
     unsigned char       data_tag[4];    
@@ -33,10 +33,10 @@ typedef struct Music_header{
 
 // Função para carregar informações da stream indicada pelo ponteiro "caminho" 
 // (NULL caso a saida desejada seja a entrada padrão) wave em structure indicada.
-void audio_load(char *caminho, Music_header *wave); 
+void audio_load(char *, Music_header *); 
 
 // Função para escrever informações da structure indicada em stream passada 
 // por parâmetro por meio do ponteiro "caminho" (NULL caso a saida desejada seja a saida padrão).
-void audio_set(char *caminho, Music_header *wave); 
+void audio_set(char *, Music_header *); 
 
 #endif
