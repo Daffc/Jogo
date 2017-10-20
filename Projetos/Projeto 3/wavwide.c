@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <math.h>
 #include "audio-open.h"
 #include "arg-treat.h"
@@ -16,11 +17,11 @@ int main (int argc, char *argv[])
     char                *origem = NULL,
                         *destino = NULL;
 
-    int                 i,
+    int32_t             i,
                         maior_sample = 0,
                         *transitorio;
 
-    short               desvio,
+    int16_t            desvio,
                         max_amplitude = 32767;
 
     float               fator = 1.0,
@@ -38,17 +39,17 @@ int main (int argc, char *argv[])
         if(cabecalho.num_channels == 2)
         {
 
-            transitorio = malloc_seguro(cabecalho.data_size * ( sizeof(int)/sizeof(short) ));
+            transitorio = malloc_seguro(cabecalho.data_size * ( sizeof(int)/sizeof(int16_t) ));
             
             // Laço percorre a semple de duas em duas ( conjunto L e R ) e efetua operação para gerar 
             // efeito desejado e guardando resultado em malloc "transitorio".
             for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i += 2)
             {  
-                desvio = *(((short *)(cabecalho.DATA)) + i + 1) - *(((short *)(cabecalho.DATA)) + i);
+                desvio = *(((int16_t *)(cabecalho.DATA)) + i + 1) - *(((int16_t *)(cabecalho.DATA)) + i);
 
 
-                *(transitorio + i) = *(((short *)(cabecalho.DATA)) + i) - trunc(fator * desvio);
-                *(transitorio + i + 1) =*(((short *)(cabecalho.DATA)) + i + 1) + trunc(fator * desvio);
+                *(transitorio + i) = *(((int16_t *)(cabecalho.DATA)) + i) - trunc(fator * desvio);
+                *(transitorio + i + 1) =*(((int16_t *)(cabecalho.DATA)) + i + 1) + trunc(fator * desvio);
                 
                 if(abs(*(transitorio + i)) > maior_sample)
                 {
@@ -69,7 +70,7 @@ int main (int argc, char *argv[])
             // forma a preservar a qualidade do audio.
             for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
             {   
-                *((short *)(cabecalho.DATA) + i) = trunc(*(transitorio + i) * diferenca);
+                *((int16_t *)(cabecalho.DATA) + i) = trunc(*(transitorio + i) * diferenca);
             }
                         
             // Envia informações para imprimir em arquivo selecionado 

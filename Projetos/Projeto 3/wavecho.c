@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
 #include "audio-open.h"
 #include "arg-treat.h"
 #include "utilidades.h"
@@ -22,7 +23,7 @@ int main (int argc, char *argv[])
                         soma_echo,
                         *transitorio;
     
-    short               max_amplitude = 32767;
+    int16_t            max_amplitude = 32767;
 
     float               atenuacao = 0.5,
                         diferenca;
@@ -34,12 +35,12 @@ int main (int argc, char *argv[])
         // Carrega informações do audio de entrada na structure "cabecalho". 
         audio_load(origem, &cabecalho);
 
-        transitorio = malloc_seguro(cabecalho.data_size * ( sizeof(int)/sizeof(short) ));
+        transitorio = malloc_seguro(cabecalho.data_size * ( sizeof(int)/sizeof(int16_t) ));
 
         for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
         {   
 
-            *(transitorio + i) = *(((short *)(cabecalho.DATA)) + i);
+            *(transitorio + i) = *(((int16_t *)(cabecalho.DATA)) + i);
         }
     
         // Laço que ira propagar o eco enquanto o tempo para o fim for maior que o tempo de propagação do eco 
@@ -52,7 +53,7 @@ int main (int argc, char *argv[])
         {
             // DESLOCAMENTO NO TEMPO(POSICAO[i + (SAMPLES/SEG * SEG)]) += (POSIÇÃO[i] * atenuação);
             // A soma de 0.5 serve para melhor aprocimação no arredondamento pos cast de floa para int.
-            *(transitorio + i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5)) = *(((short *)(cabecalho.DATA)) + i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5)) + trunc(*((short *)(cabecalho.DATA) + i) * atenuacao);
+            *(transitorio + i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5)) = *(((int16_t *)(cabecalho.DATA)) + i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5)) + trunc(*((int16_t *)(cabecalho.DATA) + i) * atenuacao);
             
             soma_echo = abs(*(transitorio + i + (int)((cabecalho.sample_rate * (1.0 * tempo/1000))+ 0.5)));
             
@@ -73,7 +74,7 @@ int main (int argc, char *argv[])
         // "cabecalho.DATA" de forma a normaliza-las Evitando a depredação do audio final.
         for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
         {   
-            *((short *)(cabecalho.DATA) + i) = trunc(*(transitorio + i) * diferenca);
+            *((int16_t *)(cabecalho.DATA) + i) = trunc(*(transitorio + i) * diferenca);
         }
 
         // Envia informações para imprimir em arquivo selecionado 

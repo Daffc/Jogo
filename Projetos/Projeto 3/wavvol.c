@@ -17,7 +17,7 @@ int main (int argc, char *argv[])
     int32_t             i,
                         transitorio;
     
-    short               clipping = 32767;
+    int16_t             clipping = 32767;
 
     float               volume = 1;
 
@@ -33,7 +33,7 @@ int main (int argc, char *argv[])
         // indicado pelo usuário ou por 1.0, como padrão.
         for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
         {
-            transitorio = *((short *)(cabecalho.DATA) + i) * volume;
+            transitorio = *((int16_t *)(cabecalho.DATA) + i) * volume;
             
 
             //  Pocesso para detectar overflow das samples e adaptalos a clippings.
@@ -41,17 +41,17 @@ int main (int argc, char *argv[])
             {
                 if(transitorio > 0)
                 {
-                    *(((short *)(cabecalho.DATA)) + i) = clipping;
+                    *(((int16_t *)(cabecalho.DATA)) + i) = clipping;
                 }
                 else
                 {
-                    *(((short *)(cabecalho.DATA)) + i) = -clipping;
+                    *(((int16_t *)(cabecalho.DATA)) + i) = -clipping;
                 }
                 
             }
             else
             {
-                *(((short *)(cabecalho.DATA)) + i) = transitorio;
+                *(((int16_t *)(cabecalho.DATA)) + i) = transitorio;
             }           
             
         }

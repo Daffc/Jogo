@@ -23,9 +23,11 @@ int main (int argc, char *argv[])
                         entradas = 0,
                         comprimento_max = 0,
                         amplitude_max = 0,
-                        soma = 0;
+                        soma = 0,
+                        canais = 0,
+                        posicao;
     
-    short               par_normalizacao = 32767;
+    int16_t            par_normalizacao = 32767;
 
     double              indice_correcao;
 
@@ -46,12 +48,6 @@ int main (int argc, char *argv[])
         {
             // Carrega cada arquivo de audio indicado como entrada em uma structure própria.
             audio_load(pnts_origem[i], (cabecalho + i));
-            
-            // Separa o maior comprimento de audio, que será o comprimento do audio mixado.
-            if((cabecalho + i)->data_size > comprimento_max)
-            {
-                comprimento_max = (cabecalho + i)->data_size;
-            }
 
             // Verifica se todos os arquivos wav dados como entrada possuem o mesmo semple rate, 
             // caso não possuam, o programa é abortado.
@@ -60,11 +56,27 @@ int main (int argc, char *argv[])
                 fprintf(stderr, "O programa só pode tratar de arquivos wave com o mesmo sample rate.\n");
                 exit(-1);
             }
+
+            // Verifica qual é o audio com o maior numero da canais e salva esse número na variável canais.
+            if((cabecalho + i)->num_channels > canais)
+            {
+                canais = (cabecalho + i)->num_channels;
+            }
+        }
+
+        for (i = 0; i < entradas; i++)
+        {
+            // Separa o maior comprimento de audio, que será o comprimento do audio mixado, 
+            // levando em consideração o seu comprimento e a sua quantidade de canais.
+            if((cabecalho + i)->data_size / (cabecalho + i)->num_channels > comprimento_max / canais)
+            {
+                comprimento_max = (cabecalho + i)->data_size * ( canais / ( cabecalho + i )->num_channels);
+            }
         }
     
         // Laço que ira procurar por maior soma samples entre os audios, 
         // sendo "i" o indicador de quais samples devem ser somadas.
-        for(i = 0; i < comprimento_max / sizeof(short); i++)
+        for(i = 0; i < comprimento_max / sizeof(int16_t); i++)
         {
             soma = 0;
     
@@ -72,11 +84,13 @@ int main (int argc, char *argv[])
             // indicada de cara um deles e somando seus valores na variavel "soma".
             for(j = 0; j < entradas; j++)
             {
-                // Verifica-se caso o audio "j" analisado contem a semple de posição "i", caso contenha seu valr é somado as 
-                // demais semplas de mesma posição dos outros arquivos de audio, caso não contenha, seu valor não é acrecentado.
+                // Verifica-se caso o audio "j" analisado contem a semple de posição "i" relativa ao ao maior número de canais e 
+                // ao número de canais do audio de entrada, caso contenha seu valor é somado as demais samples de mesma posição 
+                // relativisada dos outros arquivos de audio, caso não contenha, seu valor não é acrecentado.
                 if(i < (cabecalho + j)->samples_channel * (cabecalho + j)->num_channels)
                 {
-                    soma += *((short *)((cabecalho + j)->DATA) + i);
+                    posicao = (int32_t)((((cabecalho + j)->num_channels * 1.0) / canais) * i);
+                    soma += *((int16_t *)((cabecalho + j)->DATA) + posicao);
                 }
             }
     
@@ -99,6 +113,7 @@ int main (int argc, char *argv[])
         // das várias entradas.
         saida.data_size = comprimento_max;
         saida.riff_size = saida.data_size + 36;
+        saida.byte_rate = saida.sample_rate * canais * sizeof(int16_t);
         saida.DATA = malloc_seguro(comprimento_max);
         saida.samples_channel = saida.data_size / saida.block_align;
     
@@ -112,16 +127,16 @@ int main (int argc, char *argv[])
             // indicada de cara um deles e somando seus valores na variavel "soma".
             for(j = 0; j < entradas; j++)
             {
-                // Verifica-se caso o audio "j" analisado contem a semple de posição "i", caso contenha seu valr é somado as 
+                // Verifica-se caso o audio "j" analisado contem a semple de posição "i", caso contenha seu valor é somado as 
                 // demais semplas de mesma posição dos outros arquivos de audio, caso não contenha, seu valor não é acrecentado.
-                if(i < (cabecalho + j)->samples_channel * (cabecalho + j)->num_channels)
+                if(i < (cabecalho + j)->samples_channel * (cabecalho + j)->num_channels * ( canais / ( cabecalho + j )->num_channels))
                 {
-                    soma += *((short *)((cabecalho + j)->DATA) + i);
+                    soma += *((int16_t *)((cabecalho + j)->DATA) + i);
                 }
             }
         
             // Atribui-se ao audio de saida soma de samples multiplicada pelo indice de correção, de forma a evitar distorções.
-            *(((short *)saida.DATA )+ i) = trunc(soma * indice_correcao);
+            *(((int16_t *)saida.DATA )+ i) = trunc(soma * indice_correcao);
         }
         // Envia informações para emprimir em arquivo selecionado 
         // ou saida padrão o arquivo wave configurado.

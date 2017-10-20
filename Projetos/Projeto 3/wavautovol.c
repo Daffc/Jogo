@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <math.h>
 #include "audio-open.h"
 #include "arg-treat.h"
@@ -19,8 +20,8 @@ int main (int argc, char *argv[])
     int                 i,
                         canal;
 
-                        //Vetor para armazenar short's com os valores de maior amplitude no audio / canal.
-    short               *maior,
+                        //Vetor para armazenar int16_t's com os valores de maior amplitude no audio / canal.
+    int16_t            *maior,
                         max_amplitude = 32767;
 
                         // Vetor para guardar coeficiente de normalização de cada canal.
@@ -34,7 +35,7 @@ int main (int argc, char *argv[])
     // Criam-se vetores um para armazenar os maiores valores de cada um dos
     // canais e outro para armazenar o incice de correção de acordo com o número 
     // de canais informados no header do arquivo .wav.
-    maior = malloc_seguro(cabecalho.num_channels * sizeof(short));
+    maior = malloc_seguro(cabecalho.num_channels * sizeof(int16_t));
     diferenca = malloc_seguro(cabecalho.num_channels * sizeof(double));
 
     // Zeram-se todos os valores relacionados ao número de canais.
@@ -52,9 +53,9 @@ int main (int argc, char *argv[])
 
         // Caso valor "maior" relativo ao canal selecionado seja menor que o da semple atual
         // ele é substiduido.
-        if(abs(*(((short *)(cabecalho.DATA)) + i)) > *(maior + canal))
+        if(abs(*(((int16_t *)(cabecalho.DATA)) + i)) > *(maior + canal))
         {
-            *(maior + canal) = abs(*(((short *)(cabecalho.DATA)) + i));
+            *(maior + canal) = abs(*(((int16_t *)(cabecalho.DATA)) + i));
         }       
     }
 
@@ -70,7 +71,7 @@ int main (int argc, char *argv[])
     for(i = 0; i < (cabecalho.samples_channel * cabecalho.num_channels); i++)
     {
         canal = (i % cabecalho.num_channels);
-        *(((short *)(cabecalho.DATA)) + i) = trunc(*(((short *)(cabecalho.DATA)) + i) * *(diferenca + canal));
+        *(((int16_t *)(cabecalho.DATA)) + i) = trunc(*(((int16_t *)(cabecalho.DATA)) + i) * *(diferenca + canal));
     }
     
     // Envia-se structure com arquivo wav modificado para ser impresso.

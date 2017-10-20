@@ -15,22 +15,32 @@ int main (int argc, char *argv[])
     char                *origem = NULL,
                         *destino = NULL;
 
-    int                 i,
-                        transitorio;
+    int32_t             i,
+                        j;
+
+    int16_t             transitorio;
 
     tratamento_simples(&argc, argv, "io" , 2, &origem, &destino, NULL, NULL);
+
 
     // Carrega informações do audio de entrada na structure "cabecalho". 
     audio_load(origem, &cabecalho);
 
-    // Laçoira repetir ("samples_channel" / 2 arredondado para baixo) veses e 
-    // trocarão o primeiro valor com o ultimo, o segundo com o penultimo e assim sucessivamente.
-    for(i = 0; i <= ((cabecalho.samples_channel / 2) - 1); i++)
+    // Laço ira repetir ("samples_channel" / 2 arredondado para baixo) veses e 
+    // trocarão o primeiro bloco de samples com o ultimo, o segundo com o penultimo e assim sucessivamente.
+    for(i = 0; i < (cabecalho.samples_channel / 2); i++)
     {
-        transitorio = *(((int32_t *)(cabecalho.DATA)) + i);
 
-        *(((int32_t *)(cabecalho.DATA)) + i) = *(((int32_t *)(cabecalho.DATA)) + cabecalho.samples_channel - (i + 1));
-        *(((int32_t *)(cabecalho.DATA)) + cabecalho.samples_channel - (i + 1)) = transitorio;
+        // Laço que determinará qual dos canais deve ser trocado de acordo com o número de canais definido em "cabecalho.num_channels",
+        // trocando o primeiro sample do primeiro bloco com o primeiro sample do ultimo bloco, o sagundo sample do primeiro bloco com o segundo sample do ultimo bloco...
+        for(j = 0; j < cabecalho.num_channels; j ++)
+        {
+            transitorio = *(((int16_t *)(cabecalho.DATA)) + (cabecalho.num_channels * i) + j);
+            
+            *(((int16_t *)(cabecalho.DATA)) + (cabecalho.num_channels * i) + j) = *(((int16_t *)(cabecalho.DATA)) + ((cabecalho.samples_channel - i)  * cabecalho.num_channels) + j);
+            *(((int16_t *)(cabecalho.DATA)) + ((cabecalho.samples_channel - i)  * cabecalho.num_channels) + j) = transitorio;
+        }
+        
     }
     
     // Envia informações para imprimir em arquivo selecionado 
