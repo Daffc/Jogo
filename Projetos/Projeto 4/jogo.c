@@ -81,22 +81,34 @@ int main(int argc, char *argv[])
 			/*	---------- APRIMORAR VERIFICAÇÃO COM MATRIZ POSTERIORMENTE !!!! ----------- */
 			/**/if((jogador.xPosi == carros[cont].xPosi) && (jogador.yPosi == carros[cont].yPosi))
 			/**/{
-			/**/	remove_jogador (&jogador, janela);
-			/**/	reposiciona_jogador( &jogador, janela);
+			/**/	morte_jogador(&jogador, janela);
+			/**/	if(jogador.vidas == 0)
+			/**/	{
+			/**/		printw("MORREU-SE");
+			/**/		goto FIM;
+			/**/	}
 			/**/};
 			/**/if((jogador.xPosi == carros[cont].xPosi + 1) && (jogador.yPosi == carros[cont].yPosi))
 			/**/{
-			/**/	remove_jogador (&jogador, janela);
-			/**/	reposiciona_jogador( &jogador, janela);
+			/**/	morte_jogador(&jogador, janela);
+			/**/	if(jogador.vidas == 0)
+			/**/	{
+			/**/		printw("MORREU-SE");
+			/**/		goto FIM;
+			/**/	}
 			/**/}
 			/**/if((jogador.xPosi + 1 == carros[cont].xPosi) && (jogador.yPosi == carros[cont].yPosi))
 			/**/{
-			/**/	remove_jogador (&jogador, janela);
-			/**/	reposiciona_jogador( &jogador, janela);
+			/**/	morte_jogador(&jogador, janela);
+			/**/	if(jogador.vidas == 0)
+			/**/	{
+			/**/		printw("MORREU-SE");
+			/**/		goto FIM;
+			/**/	}
 			/**/}
 		}
 	}
-
+	FIM:
 	endwin();
 	return 0;
 }

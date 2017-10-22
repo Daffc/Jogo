@@ -89,6 +89,9 @@ void iniciar_jogador(Jogador *jogador, WINDOW *tela)
     jogador->trascima = 'x';
     jogador->trasbaixo = 'x' ;
 
+    jogador->vidas = 3;
+    jogador->pontos = 0;
+
     // Coloca jogador na posição inicial e atualiza window.
     reposiciona_jogador(jogador, tela);
 }
@@ -113,4 +116,10 @@ int capi_movimento(Jogador *jogador, WINDOW *tela, int max_larg, int max_comp)
             break;
     }
     return ch;
+}
+void morte_jogador(Jogador *jogador, WINDOW *tela)
+{
+    jogador->vidas --;
+    remove_jogador (jogador, tela);
+    reposiciona_jogador( jogador, tela);
 }
